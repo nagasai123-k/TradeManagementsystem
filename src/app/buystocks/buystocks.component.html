@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Instrument ID</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .heading {
+            color: #666;
+            font-size: 28px;
+            margin-bottom: 30px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: #fff;
+            color: #333;
+        }
+
+        .form-group input:disabled {
+            background-color: #f8f9fa;
+            color: #666;
+        }
+
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8.825L1.175 4 2.238 2.938 6 6.7l3.763-3.762L10.825 4z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+        }
+
+        .form-text {
+            font-size: 13px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .btn-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-grey {
+            background-color: #757575;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="heading">Select the instrument ID</h1>
+        <form>
+            <div class="form-group">
+                <input type="text" disabled placeholder="Client ID" name="clientId" [(ngModel)]="clientid">
+                <small class="form-text">Your unique client identifier</small>
+            </div>
+
+            <div class="form-group">
+                <input type="text" disabled placeholder="Client Name" name="clientName" [(ngModel)]="client.clientname">
+            </div>
+
+            <div class="form-group">
+                <select [(ngModel)]="instrumentid" (change)="getInstrumentName()" name="instrumentId">
+                    <option value="0">Select Instrument ID</option>
+                    <option value="I001">I001</option>
+                    <option value="I002">I002</option>
+                    <option value="I003">I003</option>
+                    <option value="I004">I004</option>
+                    <option value="I005">I005</option>
+                </select>
+                <small class="form-text">Choose your instrument ID</small>
+            </div>
+
+            <div class="form-group">
+                <input type="text" disabled placeholder="Instrument Name" name="instrumentName" value="{{instrumentDetails.instrumentname}}">
+            </div>
+
+            <div class="form-group">
+                <input type="text" disabled placeholder="Face Value" name="faceValue" value="{{instrumentDetails.facevalue}}">
+            </div>
+
+            <div class="form-group">
+                <input type="text" disabled placeholder="Expiry Date" name="expiryDate" value="{{instrumentDetails.expirydate | date: 'dd/MM/yyyy'}}">
+            </div>
+
+            <div class="form-group">
+                <select [(ngModel)]="quantity" name="quantity">
+                    <option value="0">Select Quantity</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="75">75</option>
+                    <option value="100">100</option>
+                </select>
+                <small class="form-text">Select the quantity you want to buy</small>
+            </div>
+
+            <div class="form-group">
+                <input type="number" [(ngModel)]="price" placeholder="Enter Price" name="price">
+            </div>
+
+            <div class="button-group">
+                <button type="button" (click)="onSubmit()" class="btn btn-success">Buy</button>
+                <button type="button" (click)="onBgo()" class="btn btn-grey">Cancel</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
