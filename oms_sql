@@ -1,0 +1,160 @@
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+
+-- Creating a new database
+CREATE DATABASE IF NOT EXISTS `tms1` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+USE `tms1`;
+
+-- Table: purchase_records
+CREATE TABLE IF NOT EXISTS `purchase_records` (
+  `purchase_id` int(11) NOT NULL AUTO_INCREMENT,
+  `customer_id` varchar(100) NOT NULL,
+  `asset_id` varchar(50) NOT NULL,
+  `units` int(11) NOT NULL,
+  `rate` double NOT NULL,
+  `purchase_date` datetime NOT NULL,
+  PRIMARY KEY (`purchase_id`),
+  KEY `customer_fk` (`customer_id`),
+  KEY `asset_fk` (`asset_id`),
+  CONSTRAINT `customer_fk` FOREIGN KEY (`customer_id`) REFERENCES `clients` (`id`),
+  CONSTRAINT `asset_fk` FOREIGN KEY (`asset_id`) REFERENCES `assets` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4;
+
+-- Insert data into purchase_records
+REPLACE INTO `purchase_records` (`purchase_id`, `customer_id`, `asset_id`, `units`, `rate`, `purchase_date`) VALUES
+	(101, 'CUST002', 'A002', 25, 50, '2021-09-20 11:51:08'),
+	(102, 'CUST001', 'A002', 25, 100, '2021-09-20 14:26:00'),
+	(103, 'CUST001', 'A004', 50, 67, '2021-09-20 15:23:25'),
+	(104, 'CUST001', 'A004', 25, 67, '2021-09-20 16:16:11'),
+	(105, 'CUST001', 'A003', 50, 100, '2021-09-20 16:46:49');
+
+-- Table: clients
+CREATE TABLE IF NOT EXISTS `clients` (
+  `id` varchar(100) NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `credit_limit` double NOT NULL,
+  `custodian` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `custodian_fk` (`custodian`),
+  CONSTRAINT `custodian_fk` FOREIGN KEY (`custodian`) REFERENCES `custodians` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Insert data into clients
+REPLACE INTO `clients` (`id`, `name`, `credit_limit`, `custodian`) VALUES
+	('CUST001', 'BANK OF AMERICA', 14000000, 'CUST001'),
+	('CUST002', 'CITIBANK', 14000000, 'CUST001'),
+	('CUST003', 'CHASE BANK', 18000000, 'CUST002'),
+	('CUST004', 'JP MORGAN', 5000000, 'CUST002');
+
+-- Table: customer_assets
+CREATE TABLE IF NOT EXISTS `customer_assets` (
+  `customer_id` varchar(100) NOT NULL,
+  `asset_id` varchar(50) NOT NULL,
+  `amount` int(11) NOT NULL,
+  `entry_id` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`entry_id`),
+  KEY `cust_fk` (`customer_id`),
+  KEY `asset_fk` (`asset_id`),
+  CONSTRAINT `cust_fk` FOREIGN KEY (`customer_id`) REFERENCES `clients` (`id`),
+  CONSTRAINT `asset_fk` FOREIGN KEY (`asset_id`) REFERENCES `assets` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4;
+
+-- Insert data into customer_assets
+REPLACE INTO `customer_assets` (`customer_id`, `asset_id`, `amount`, `entry_id`) VALUES
+	('CUST002', 'A003', 0, 1),
+	('CUST001', 'A003', 50, 2),
+	('CUST001', 'A001', 75, 3),
+	('CUST003', 'A001', 75, 4),
+	('CUST001', 'A002', 75, 5),
+	('CUST003', 'A002', 25, 6),
+	('CUST002', 'A004', 50, 7),
+	('CUST001', 'A004', 50, 8),
+	('CUST004', 'A005', 50, 9),
+	('CUST001', 'A005', 50, 10);
+
+-- Table: custodians
+CREATE TABLE IF NOT EXISTS `custodians` (
+  `id` varchar(100) NOT NULL,
+  `custodian_name` varchar(150) NOT NULL,
+  `auth_code` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Insert data into custodians
+REPLACE INTO `custodians` (`id`, `custodian_name`, `auth_code`) VALUES
+	('CUST001', 'DEUTSCHE BANK', 'auth001'),
+	('CUST002', 'CREDIT SUISSE', 'auth002'),
+	('CUST003', 'HSBC HOLDINGS', 'auth003'),
+	('CUST004', 'MORGAN STANLEY', 'auth004');
+
+-- Table: assets
+CREATE TABLE IF NOT EXISTS `assets` (
+  `id` varchar(50) NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `nominal_value` int(10) DEFAULT NULL,
+  `expiry` datetime DEFAULT NULL,
+  `available_units` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Insert data into assets
+REPLACE INTO `assets` (`id`, `name`, `nominal_value`, `expiry`, `available_units`) VALUES
+	('A001', 'US Treasury Bonds', 100, '2025-09-17 09:28:12', 25),
+	('A002', 'Corporate Bonds - 2026', 1000, '2026-09-17 09:28:12', 50),
+	('A003', 'Municipal Bonds - 2045', 1000, '2045-09-17 09:28:12', 75),
+	('A004', 'USD Exchange', 1000, '2025-09-17 09:28:12', 100),
+	('A005', 'EUR/USD Futures', 1000, '2027-09-17 09:28:12', 100);
+
+-- Table: asset_transactions
+CREATE TABLE IF NOT EXISTS `asset_transactions` (
+  `txn_id` int(20) NOT NULL AUTO_INCREMENT,
+  `buyer` varchar(100) NOT NULL,
+  `seller` varchar(100) NOT NULL,
+  `buyer_custodian` varchar(100) NOT NULL,
+  `seller_custodian` varchar(100) NOT NULL,
+  `asset_id` varchar(50) NOT NULL,
+  `transfer_time` datetime NOT NULL,
+  `units` int(11) NOT NULL,
+  `unit_price` double NOT NULL,
+  `total_value` double NOT NULL,
+  PRIMARY KEY (`txn_id`),
+  KEY `buyer_fk` (`buyer`),
+  KEY `seller_fk` (`seller`),
+  KEY `buyer_cust_fk` (`buyer_custodian`),
+  KEY `seller_cust_fk` (`seller_custodian`),
+  KEY `asset_fk` (`asset_id`),
+  CONSTRAINT `buyer_fk` FOREIGN KEY (`buyer`) REFERENCES `clients` (`id`),
+  CONSTRAINT `seller_fk` FOREIGN KEY (`seller`) REFERENCES `clients` (`id`),
+  CONSTRAINT `buyer_cust_fk` FOREIGN KEY (`buyer_custodian`) REFERENCES `custodians` (`id`),
+  CONSTRAINT `seller_cust_fk` FOREIGN KEY (`seller_custodian`) REFERENCES `custodians` (`id`),
+  CONSTRAINT `asset_fk` FOREIGN KEY (`asset_id`) REFERENCES `assets` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Insert data into asset_transactions
+REPLACE INTO `asset_transactions` (`txn_id`, `buyer`, `seller`, `buyer_custodian`, `seller_custodian`, `asset_id`, `transfer_time`, `units`, `unit_price`, `total_value`) VALUES
+	(1, 'CUST002', 'CUST001', 'CUST001', 'CUST001', 'A004', '2021-09-20 12:09:02', 75, 200, 15000),
+	(2, 'CUST002', 'CUST001', 'CUST001', 'CUST001', 'A003', '2021-09-20 12:10:09', 25, 100, 2500);
+
+-- Procedures
+DELIMITER //
+
+CREATE PROCEDURE `removePurchaseRecord`(IN pid INT)
+BEGIN
+  DELETE FROM `purchase_records` WHERE `purchase_id` = pid;
+END//
+
+CREATE PROCEDURE `insertPurchase`(IN cid VARCHAR(20), IN aid VARCHAR(20), IN amt INT)
+BEGIN
+  IF EXISTS (SELECT * FROM `customer_assets` WHERE `customer_id` = cid AND `asset_id` = aid) THEN
+    UPDATE `customer_assets` SET `amount` = `amount` + amt WHERE `customer_id` = cid AND `asset_id` = aid;
+  ELSE
+    INSERT INTO `customer_assets` (`customer_id`, `asset_id`, `amount`) VALUES (cid, aid, amt);
+  END IF;
+END//
+
+DELIMITER ;
